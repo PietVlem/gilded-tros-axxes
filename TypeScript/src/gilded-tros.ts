@@ -9,37 +9,48 @@ export class GildedTros {
         const goodWine = 'Good Wine'
         const bDawgKeychain = 'B-DAWG Keychain'
 
-        for (let i = 0; i < this.items.length; i++) {
-            const { name, quality, sellIn } = this.items[i];
+        for (const item of this.items) {
+            const { name } = item;
 
-            if (![goodWine, backstageReFactor, backstageHaxx, bDawgKeychain].includes(name) && quality > 0) {
-                this.items[i].quality--;
-            } else {
-                if (quality < 50) {
-                    this.items[i].quality++;
+            if (name === bDawgKeychain) continue;
 
-                    if (name === backstageReFactor) {
-                        if (sellIn < 11 && quality < 50) this.items[i].quality++;
-                        if (sellIn < 6 && quality < 50) this.items[i].quality++;
-                    }
+            item.sellIn--;
+
+            switch (name) {
+                case goodWine: {
+                    this.updateGoodWine(item);
+                    break;
                 }
-            }
-
-            if (name !== bDawgKeychain) this.items[i].sellIn--;
-
-            if (sellIn < 0) {
-                if (name !== goodWine) {
-                    if ([backstageReFactor, backstageHaxx].includes(name)) {
-                        this.items[i].quality = 0;
-                    } else if (quality > 0 && name !== bDawgKeychain) {
-                        this.items[i].quality--;
-                    }
-                    continue;
+                case backstageReFactor:
+                case backstageHaxx: {
+                    this.updateBackstagePass(item);
+                    break;
+                }
+                default: {
+                    this.updateNormalItem(item);
+                    break;
                 }
 
-                if (quality < 50) this.items[i].quality++;
             }
         }
     }
 
+    private updateNormalItem(item: Item): void {
+        if (item.quality > 0) item.quality--;
+        if (item.sellIn < 0 && item.quality > 0) item.quality--;
+    }
+
+    private updateGoodWine(item: Item): void {
+        if (item.quality < 50) item.quality++;
+        if (item.sellIn < 0 && item.quality < 50) item.quality++;
+    }
+
+    private updateBackstagePass(item: Item): void {
+        if (item.quality < 50) {
+            item.quality++;
+            if (item.sellIn < 11 && item.quality < 50) item.quality++;
+            if (item.sellIn < 6 && item.quality < 50) item.quality++;
+        }
+        if (item.sellIn < 0) item.quality = 0;
+    }
 }
