@@ -10,55 +10,36 @@ export class GildedTros {
         const bDawgKeychain = 'B-DAWG Keychain'
 
         for (let i = 0; i < this.items.length; i++) {
-            if (![goodWine, backstageReFactor, backstageHaxx].includes(this.items[i].name)) {
-                if (this.items[i].quality > 0) {
-                    if (this.items[i].name !== bDawgKeychain) {
-                        this.items[i].quality--;
-                    }
-                }
+            const { name, quality, sellIn } = this.items[i];
+
+            if (![goodWine, backstageReFactor, backstageHaxx, bDawgKeychain].includes(name) && quality > 0) {
+                this.items[i].quality--;
             } else {
-                if (this.items[i].quality < 50) {
+                if (quality < 50) {
                     this.items[i].quality++;
 
-                    if (this.items[i].name === backstageReFactor) {
-                        if (this.items[i].sellIn < 11) {
-                            if (this.items[i].quality < 50) {
-                                this.items[i].quality++;
-                            }
-                        }
-
-                        if (this.items[i].sellIn < 6) {
-                            if (this.items[i].quality < 50) {
-                                this.items[i].quality++;
-                            }
-                        }
+                    if (name === backstageReFactor) {
+                        if (sellIn < 11 && quality < 50) this.items[i].quality++;
+                        if (sellIn < 6 && quality < 50) this.items[i].quality++;
                     }
                 }
             }
 
-            if (this.items[i].name !== bDawgKeychain) {
-                this.items[i].sellIn--;
-            }
+            if (name !== bDawgKeychain) this.items[i].sellIn--;
 
-            if (this.items[i].sellIn < 0) {
-                if (this.items[i].name !== goodWine) {
-                    if (this.items[i].name !== backstageReFactor || this.items[i].name !== backstageHaxx) {
-                        if (this.items[i].quality > 0) {
-                            if (this.items[i].name !== bDawgKeychain) {
-                                this.items[i].quality--;
-                            }
-                        }
-                    } else {
+            if (sellIn < 0) {
+                if (name !== goodWine) {
+                    if ([backstageReFactor, backstageHaxx].includes(name)) {
                         this.items[i].quality = 0;
+                    } else if (quality > 0 && name !== bDawgKeychain) {
+                        this.items[i].quality--;
                     }
-                } else {
-                    if (this.items[i].quality < 50) {
-                        this.items[i].quality++;
-                    }
+                    continue;
                 }
+
+                if (quality < 50) this.items[i].quality++;
             }
         }
     }
 
 }
-
