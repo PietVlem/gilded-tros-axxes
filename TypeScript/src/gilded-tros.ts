@@ -1,6 +1,8 @@
 import { Item } from './item';
 
 export class GildedTros {
+    private static readonly smellyItems = ["Duplicate Code", "Long Methods", "Ugly Variable Names"]
+
     constructor(public items: Array<Item>) { }
 
     public updateQuality(): void {
@@ -22,10 +24,9 @@ export class GildedTros {
                     break;
                 }
                 default: {
-                    this.updateNormalItem(item);
+                    this.updateItem(item);
                     break;
                 }
-
             }
         }
     }
@@ -44,8 +45,10 @@ export class GildedTros {
         if (item.sellIn < 0) item.quality = 0;
     }
 
-    private updateNormalItem(item: Item): void {
-        if (item.quality > 0) item.quality--;
-        if (item.sellIn < 0 && item.quality > 0) item.quality--;
+    private updateItem(item: Item): void {
+        const degrade = GildedTros.smellyItems.includes(item.name) ? 2 : 1;
+
+        if (item.quality > 0) item.quality -= degrade;
+        if (item.sellIn < 0 && item.quality > 0) item.quality -= degrade;
     }
 }
