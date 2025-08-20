@@ -14,41 +14,43 @@ export class GildedTros {
             item.sellIn--;
 
             switch (name) {
-                case 'Good Wine': {
+                case 'Good Wine':
                     this.updateGoodWine(item);
                     break;
-                }
                 case 'Backstage passes for Re:Factor':
-                case 'Backstage passes for HAXX': {
+                case 'Backstage passes for HAXX':
                     this.updateBackstagePass(item);
                     break;
-                }
-                default: {
+                default:
                     this.updateItem(item);
                     break;
-                }
             }
         }
     }
 
     private updateGoodWine(item: Item): void {
-        if (item.quality < 50) item.quality++;
-        if (item.sellIn < 0 && item.quality < 50) item.quality++;
+        let increment = 1;
+        if (item.sellIn < 0) increment++;
+        item.quality = Math.min(item.quality + increment, 50);
     }
 
     private updateBackstagePass(item: Item): void {
-        if (item.quality < 50) {
-            item.quality++;
-            if (item.sellIn < 11 && item.quality < 50) item.quality++;
-            if (item.sellIn < 6 && item.quality < 50) item.quality++;
+        if (item.sellIn < 0) {
+            item.quality = 0;
+            return;
         }
-        if (item.sellIn < 0) item.quality = 0;
+
+        let increment = 1;
+        if (item.sellIn < 11) increment++;
+        if (item.sellIn < 6) increment++;
+        item.quality = Math.min(item.quality + increment, 50);
     }
 
     private updateItem(item: Item): void {
         const degrade = GildedTros.smellyItems.includes(item.name) ? 2 : 1;
 
-        if (item.quality > 0) item.quality -= degrade;
-        if (item.sellIn < 0 && item.quality > 0) item.quality -= degrade;
+        let totalDegrade = degrade;
+        if (item.sellIn < 0) totalDegrade += degrade;
+        item.quality = Math.max(item.quality - totalDegrade, 0);
     }
 }
